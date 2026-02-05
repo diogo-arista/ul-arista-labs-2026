@@ -1,6 +1,8 @@
 {
-  "name": "Containerlab & DinD Environment",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
+  "name": "Containerlab Codespace",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "version": "latest",
@@ -10,7 +12,8 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "srl-labs.vscode-containerlab"
+        "srl-labs.vscode-containerlab",
+        "ms-azuretools.vscode-docker"
       ]
     }
   },
@@ -19,6 +22,5 @@
     "memory": "16gb",
     "storage": "32gb"
   },
-  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y python3-pip && pip3 install gdown --break-system-packages && bash -c \"$(curl -sL https://get.containerlab.dev)\"",
   "remoteUser": "vscode"
 }
