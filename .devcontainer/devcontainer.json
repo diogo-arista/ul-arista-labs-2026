@@ -1,5 +1,5 @@
 {
-  "name": "Containerlab Codespace",
+  "name": "Arista/UL Codespaces",
   "build": {
     "dockerfile": "Dockerfile"
   },
