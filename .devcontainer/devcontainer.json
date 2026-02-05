@@ -1,29 +1,16 @@
 {
-  "name": "Arista / UL Labs",
-  "image": "ghcr.io/aristanetworks/aclabs/lab-base:python3.11-avd-v5.7.2-clab0.72.0-rev2.6.1-uid1009",
+  "name": "Containerlab & DinD Environment",
+  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "version": "latest",
       "moby": true
     }
   },
-  "runArgs": ["--privileged"],
-  "settings": {
-    "terminal.integrated.shell.linux": "/bin/bash"
-  },
   "customizations": {
     "vscode": {
-      "settings": {
-        "terminal.integrated.profiles.linux": {
-          "bash": {
-            "path": "/bin/bash",
-            "icon": "terminal-bash"
-          }
-        },
-        "terminal.integrated.defaultProfile.linux": "bash"
-      },
       "extensions": [
-        "srl-labs.vscode-containerlab"
+        "h-westphal.containerlab"
       ]
     }
   },
@@ -31,5 +18,7 @@
     "cpus": 4,
     "memory": "16gb",
     "storage": "32gb"
-  }
+  },
+  "postCreateCommand": "sudo apt-get update && sudo apt-get install -y python3-pip && pip3 install gdown --break-system-packages && bash -c \"$(curl -sL https://get.containerlab.dev)\"",
+  "remoteUser": "vscode"
 }
