@@ -3,18 +3,18 @@ topology:
   nodes:
     ceos1:
       kind: arista_ceos
-      memory: 1gb
-      cpu: 1.5
+#      memory: 1gb
+#      cpu: 1.5
     ceos2:
       kind: arista_ceos
     node1:
       kind: linux
-      startup-delay: 30
-      memory: 1gb
-      cpu: 1.5
+      startup-delay: 15
+#      memory: 1gb
+#      cpu: 1.5
     node2:
       kind: linux
-      startup-delay: 30
+      startup-delay: 15
   kinds:
     arista_ceos:
       image: ceos:latest
