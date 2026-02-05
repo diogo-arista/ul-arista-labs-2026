@@ -1,6 +1,6 @@
 {
   "name": "Arista / UL Labs",
-  "image": "ghcr.io/aristanetworks/aclabs/lab-base:python3.11-avd-v5.1.0-clab0.65.1-rev1.3",
+  "image": "ghcr.io/aristanetworks/aclabs/lab-base:python3.11-avd-v5.7.2-clab0.72.0-rev2.6.1-uid1009",
   "features": {
     "ghcr.io/devcontainers/features/docker-in-docker:2": {
       "version": "latest",
