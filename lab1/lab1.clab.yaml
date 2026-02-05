@@ -1,5 +1,4 @@
 name: lab1
-
 topology:
   nodes:
     ceos1:
@@ -8,10 +7,10 @@ topology:
       kind: arista_ceos
     node1:
       kind: linux
-      startup-delay: 60
+      startup-delay: 30
     node2:
       kind: linux
-      startup-delay: 90
+      startup-delay: 30
   kinds:
     arista_ceos:
       image: ceos:latest
