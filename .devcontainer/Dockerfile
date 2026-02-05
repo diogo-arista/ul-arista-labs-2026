@@ -1,5 +1,4 @@
 FROM mcr.microsoft.com/devcontainers/base:ubuntu
-FROM ghcr.io/aristanetworks/aclabs/host-ubuntu:rev1.0
 
 # 1. Install system dependencies & setup python alias
 # 2. Install gdown (using --break-system-packages for Ubuntu 24.04)
