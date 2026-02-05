@@ -10,7 +10,7 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "h-westphal.containerlab"
+        "srl-labs.vscode-containerlab"
       ]
     }
   },
