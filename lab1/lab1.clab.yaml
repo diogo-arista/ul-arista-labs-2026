@@ -23,9 +23,9 @@ topology:
       exec:
         - "ip link set dev eth1 address 00:00:00:00:00:02"
       env:
-        IPV4: 10.10.10.102/24
+        IPV4: 10.10.20.102/24
         STATIC_ROUTE: 10.0.0.0/8
-        GW: 10.10.10.1
+        GW: 10.10.20.1
       startup-delay: 15
   kinds:
     arista_ceos:
