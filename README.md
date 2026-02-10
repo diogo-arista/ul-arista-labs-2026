@@ -2,6 +2,8 @@
 
 This repository contains the necessary files to build and run the labs part of the SDN course. They were designed to be run directly on Codespaces, but you can also run them locally in your own Linux environment.
 
+Please refer to the lab workbook provider by your professor for more details.
+
 For more information on how to deploy virtual lab environments using cEOS-lab and Containerlab, see the following articles:
 
 - https://arista.my.site.com/AristaCommunity/s/article/Getting-Started-with-cEOS-lab-in-Containerlab
