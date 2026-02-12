@@ -4,9 +4,15 @@ topology:
     ceos1:
       kind: arista_ceos
 #      memory: 1gb
-#      cpu: 1.5
+      cpu: 1
+      cpu-set: 0-1
+      startup-config: configs/ceos1.cfg
     ceos2:
       kind: arista_ceos
+#      memory: 1gb
+      cpu: 1
+      cpu-set: 2-3
+      startup-config: configs/ceos2.cfg
     node1:
       kind: linux
       exec:
@@ -17,7 +23,8 @@ topology:
         GW: 10.10.10.1
       startup-delay: 15
 #      memory: 1gb
-#      cpu: 1.5
+      cpu: 1
+      cpu-set: 0-1
     node2:
       kind: linux
       exec:
@@ -27,6 +34,9 @@ topology:
         STATIC_ROUTE: 10.0.0.0/8
         GW: 10.10.20.1
       startup-delay: 15
+#      memory: 1gb
+      cpu: 1
+      cpu-set: 2-3
   kinds:
     arista_ceos:
       image: ceos:latest
