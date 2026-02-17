@@ -1,42 +1,91 @@
 import pyeapi
+import argparse
+import urllib3
+import os
 import json
-from pprint import pprint
 
-# 1. Define connection details
-# Replace with your lab credentials and IP/Hostname
-connection = pyeapi.client.connect(
-    transport="https",
-    host="clab-lab2-ceos1",
-    username="admin",
-    password="pass",
-    port=443,
-    verify=False  # Skip SSL certificate check for lab use
-)
+# Disable SSL warnings for lab environments
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-# 2. Create a node object to interact with the switch
-node = pyeapi.client.Node(connection)
-
-try:
-    # 3. Execute 'show version' and capture the JSON response
-    response = node.enable("show version")
+def get_args():
+    parser = argparse.ArgumentParser(
+        description="Arista EOS Inventory & Memory Collector",
+        epilog="Example: python script.py --hosts ceos1 --json"
+    )
+    group = parser.add_mutually_exclusive_group(required=True)
+    group.add_argument("--hosts", nargs="+", help="Space-separated list of hostnames/IPs")
+    group.add_argument("--file", help="Path to a text file containing hostnames")
     
-    # The response is a list containing a dictionary for each command run
-    # Since we ran one command, we look at index [0]
-    version_data = response[0]['result']
+    parser.add_argument("--user", default="admin", help="eAPI username")
+    parser.add_argument("--password", default="arista", help="eAPI password")
+    parser.add_argument("--json", action="store_true", help="Output results in JSON format")
+    
+    return parser.parse_args()
 
-    # 4. "Do something" with the data: extract specific fields
-    model = version_data.get('modelName')
-    version = version_data.get('version')
-    mac = version_data.get('systemMacAddress')
-    uptime = version_data.get('uptime')
+def get_switch_info(hostname, user, password):
+    connection = pyeapi.client.connect(
+        transport="https",
+        host=hostname,
+        username=user,
+        password=password,
+        port=443,
+        verify=False
+    )
+    node = pyeapi.client.Node(connection)
+    try:
+        # Execute 'show version'
+        response = node.enable("show version")
+        data = response[0]['result']
+        
+        mem_total = data.get('memTotal')
+        mem_free = data.get('memFree')
+        
+        # Calculate percentage free for the table view
+        mem_pct = (mem_free / mem_total) * 100 if mem_total else 0
+        
+        return {
+            "host": hostname,
+            "model": data.get('modelName'),
+            "version": data.get('version'),
+            "mac": data.get('systemMacAddress'),
+            "memTotal": mem_total,
+            "memFree": mem_free,
+            "memFreePct": round(mem_pct, 2),
+            "status": "success"
+        }
+    except Exception as e:
+        return {"host": hostname, "error": str(e), "status": "failed"}
 
-    # 5. Show it in a "pretty" way
-    print("-" * 30)
-    print(f"Device: {model}")
-    print(f"Software: {version}")
-    print(f"MAC Address: {mac}")
-    print(f"Uptime: {uptime} seconds")
-    print("-" * 30)
+def main():
+    args = get_args()
+    target_hosts = []
+    results = []
 
-except Exception as e:
-    print(f"An error occurred: {e}")
+    if args.file:
+        if not os.path.exists(args.file):
+            print(f"Error: File {args.file} not found.")
+            return
+        with open(args.file, "r") as f:
+            target_hosts = [line.strip() for line in f if line.strip() and not line.startswith("#")]
+    else:
+        target_hosts = args.hosts
+
+    for host in target_hosts:
+        results.append(get_switch_info(host, args.user, args.password))
+
+    if args.json:
+        print(json.dumps(results, indent=4))
+    else:
+        # Adjusted header for memory columns
+        header = f"{'HOSTNAME':<22} | {'MODEL':<10} | {'VERSION':<10} | {'MEM FREE %':<10} | {'MAC ADDRESS'}"
+        print(f"\n{header}")
+        print("-" * len(header))
+        for info in results:
+            if info["status"] == "failed":
+                print(f"{info['host']:<22} | ERROR: {info['error']}")
+            else:
+                print(f"{info['host']:<22} | {info['model']:<10} | {info['version']:<10} | {info['memFreePct']:<10}% | {info['mac']}")
+        print("-" * len(header) + "\n")
+
+if __name__ == "__main__":
+    main()
