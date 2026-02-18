@@ -9,6 +9,7 @@ RUN apt-get update && apt-get install -y python3-pip curl \
     && pip3 install gdown --break-system-packages --no-cache-dir \
     && pip install pyeapi --break-system-packages \
     && pip install pygnmi --break-system-packages \
+    && apt install jq \
     && curl -sL https://get.containerlab.dev | bash \
     && groupadd -f docker \
     && groupadd -f clab_admins \
