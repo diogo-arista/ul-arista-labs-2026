@@ -7,34 +7,35 @@
     {
       "id": "ceos1",
       "position": {
-        "x": -49,
-        "y": 21
+        "x": -60,
+        "y": -40
       },
-      "icon": "pe"
+      "icon": "switch",
+      "iconCornerRadius": 0
     },
     {
       "id": "ceos2",
       "position": {
-        "x": 49,
-        "y": 21
+        "x": 120,
+        "y": -40
       },
-      "icon": "pe"
+      "icon": "switch"
     },
     {
       "id": "node1",
       "position": {
-        "x": -49,
-        "y": 91
+        "x": -60,
+        "y": 140
       },
-      "icon": "pe"
+      "icon": "server"
     },
     {
       "id": "node2",
       "position": {
-        "x": 49,
-        "y": 91
+        "x": 120,
+        "y": 140
       },
-      "icon": "pe"
+      "icon": "server"
     }
   ],
   "edgeAnnotations": [],

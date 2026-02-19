@@ -3,38 +3,38 @@ topology:
   nodes:
     ceos1:
       kind: arista_ceos
-#      memory: 1gb
+      #      memory: 1gb
       cpu: 1
       cpu-set: 0-1
       startup-config: configs/ceos1.cfg
     ceos2:
       kind: arista_ceos
-#      memory: 1gb
+      #      memory: 1gb
       cpu: 1
       cpu-set: 2-3
       startup-config: configs/ceos2.cfg
     node1:
       kind: linux
       exec:
-        - "ip link set dev eth1 address 00:00:00:00:00:01"
+        - ip link set dev eth1 address 00:00:00:00:00:01
       env:
         IPV4: 10.10.10.101/24
         STATIC_ROUTE: 10.0.0.0/8
         GW: 10.10.10.1
       startup-delay: 15
-#      memory: 1gb
+      #      memory: 1gb
       cpu: 1
       cpu-set: 0-1
     node2:
       kind: linux
       exec:
-        - "ip link set dev eth1 address 00:00:00:00:00:02"
+        - ip link set dev eth1 address 00:00:00:00:00:02
       env:
         IPV4: 10.10.10.102/24
         STATIC_ROUTE: 10.0.0.0/8
         GW: 10.10.10.1
       startup-delay: 15
-#      memory: 1gb
+      #      memory: 1gb
       cpu: 1
       cpu-set: 2-3
   kinds:
