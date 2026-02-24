@@ -1,0 +1,44 @@
+{
+  "freeTextAnnotations": [],
+  "freeShapeAnnotations": [],
+  "groupStyleAnnotations": [],
+  "networkNodeAnnotations": [],
+  "nodeAnnotations": [
+    {
+      "id": "ceos1",
+      "position": {
+        "x": -60,
+        "y": -40
+      },
+      "icon": "switch",
+      "iconCornerRadius": 0
+    },
+    {
+      "id": "ceos2",
+      "position": {
+        "x": 120,
+        "y": -40
+      },
+      "icon": "switch"
+    },
+    {
+      "id": "node1",
+      "position": {
+        "x": -60,
+        "y": 140
+      },
+      "icon": "server"
+    },
+    {
+      "id": "node2",
+      "position": {
+        "x": 120,
+        "y": 140
+      },
+      "icon": "server"
+    }
+  ],
+  "edgeAnnotations": [],
+  "aliasEndpointAnnotations": [],
+  "viewerSettings": {}
+}
