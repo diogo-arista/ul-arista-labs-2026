@@ -1,3 +1,0 @@
-clab-lab2-ceos1
-clab-lab2-ceos2
-# You can add comments or more hosts here
