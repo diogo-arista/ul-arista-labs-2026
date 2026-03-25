@@ -8,3 +8,5 @@ eos_cli: |
      protocol http
      no shutdown
   !
+  ntp server pool.ntp.org prefer
+  !

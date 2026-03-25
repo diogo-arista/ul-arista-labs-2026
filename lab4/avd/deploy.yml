@@ -22,3 +22,8 @@
       arista.eos.eos_config:
         src: "{{ playbook_dir }}/intended/configs/{{ inventory_hostname }}.cfg"
         save_when: modified
+
+    - name: Clear logging buffer (removes boot-time cEOS hardware init errors)
+      arista.eos.eos_command:
+        commands:
+          - clear logging
