@@ -2,9 +2,6 @@
 # Ansible connection settings used for all hosts in this lab.
 # AVD uses the httpapi connection plugin to reach devices via eAPI (HTTPS).
 
-# Anycast gateway MAC shared by all leafs (required when ip_address_virtual is used)
-virtual_router_mac_address: "00:1c:73:00:dc:01"
-
 ansible_user: admin
 ansible_password: admin
 ansible_network_os: eos

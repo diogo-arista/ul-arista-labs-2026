@@ -1,53 +1,37 @@
 ---
 # =============================================================================
-# NETWORK SERVICES (TENANTS, VRFs, VLANs)
+# NETWORK SERVICES (TENANTS, VLANs)
 # =============================================================================
-# This file defines Layer 2 and Layer 3 services for the fabric.
-# AVD translates this high-level intent into VXLAN, BGP EVPN, and SVI config.
+# This file defines Layer 2 services for the fabric.
+# AVD translates this high-level intent into VXLAN VNI configuration and
+# BGP EVPN MAC-VRF entries on every leaf switch.
 #
-# Hierarchy:
-#   Tenant → VRF → SVI/VLAN
+# We use a pure L2 VLAN (l2vlans) here, which gives us:
+#   - VLAN 10 configured on both leaf1 and leaf2
+#   - VNI 10010 assigned (mac_vrf_vni_base + vlan_id = 10000 + 10)
+#   - VXLAN interface mapped: VLAN 10 ↔ VNI 10010
+#   - BGP EVPN MAC-VRF 10010 advertising Type-2 routes
 #
-# The tenant concept groups all network services for a single customer or
-# business unit. In this lab we have one tenant: ACME_CORP.
+# This is the same VXLAN concept you configured manually in Lab 3,
+# but now AVD generates all the configuration automatically.
 
 tenants:
   - name: ACME_CORP
     # Base VNI for MAC-VRFs. The actual VNI = mac_vrf_vni_base + vlan_id.
-    # VLAN 10 → VNI 10010, VLAN 20 → VNI 10020, etc.
+    # VLAN 10 → VNI 10010
     mac_vrf_vni_base: 10000
-    # Anycast gateway MAC shared across all leafs for this tenant.
-    # Required when ip_address_virtual is used on any SVI.
-    virtual_router_mac_address: "00:1c:73:00:dc:01"
 
-    vrfs:
-      - name: PRODUCTION
-        # VRF VNI is used for L3VPN (IP-VRF) in BGP EVPN.
-        vrf_vni: 10
-
-        svis:
-          # VLAN 10 - "Servers"
-          # AVD configures this SVI on both leaf1 and leaf2, enabling
-          # seamless L2 extension across the VXLAN fabric. Hosts on
-          # different leafs but the same VLAN can communicate at L2.
-          - id: 10
-            name: Servers
-            enabled: true
-            # ip_address_virtual creates an anycast gateway: both leaf1
-            # and leaf2 answer ARP for 10.10.10.1 using the same MAC.
-            # This means hosts can use the same default gateway regardless
-            # of which leaf they are connected to.
-            ip_address_virtual: 10.10.10.1/24
+    l2vlans:
+      - id: 10
+        name: Servers
 
 # =============================================================================
 # CHALLENGE: Day 2 Operation
 # =============================================================================
-# To add a new VLAN to the fabric, add a new entry under svis:
+# To add a new VLAN to the fabric, add a new entry under l2vlans:
 #
-#          - id: 20
-#            name: Management
-#            enabled: true
-#            ip_address_virtual: 10.10.20.1/24
+#       - id: 20
+#         name: Management
 #
 # Then re-run: ansible-playbook build.yml && ansible-playbook deploy.yml
 # =============================================================================
