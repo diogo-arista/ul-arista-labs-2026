@@ -3,19 +3,20 @@
 # VALIDATE PLAYBOOK
 # =============================================================================
 # Runs automated network state validation using ANTA (Arista Network Test
-# Automation) against the live devices.
+# Automation). The ANTA test catalog is generated automatically by build.yml
+# (eos_designs role) based on the fabric data model.
 #
-# AVD automatically generates an ANTA test catalog based on the fabric data
-# model (FABRIC.yml, SPINES.yml, LEAFS.yml). Tests include:
-#   - Interface state (all fabric-facing interfaces must be up/up)
-#   - BGP underlay sessions (IPv4 eBGP between each leaf and the spine)
-#   - BGP EVPN overlay sessions (EVPN address-family peer state)
+# Tests include:
+#   - Interface state (all fabric interfaces must be up/up)
+#   - BGP underlay sessions (eBGP between each leaf and the spine)
+#   - BGP EVPN overlay sessions
 #   - VTEP reachability (Loopback1 IPs reachable via underlay)
 #   - VXLAN VNI configuration
 #
-# Results are saved to:
-#   reports/FABRIC-state.csv   ← machine-readable summary
-#   reports/FABRIC-state.md    ← human-readable Markdown report
+# Results are saved to the reports/ directory.
+#
+# Note: eos_validate_state was removed in AVD 6.x — use anta_runner instead.
+# See: https://avd.arista.com/6.x/docs/howto/migrate-to-anta-runner.html
 #
 # Run with:
 #   ansible-playbook validate.yml
@@ -24,6 +25,6 @@
   hosts: FABRIC
   gather_facts: false
   tasks:
-    - name: Validate network state
+    - name: Run ANTA tests
       ansible.builtin.import_role:
-        name: arista.avd.eos_validate_state
+        name: arista.avd.anta_runner

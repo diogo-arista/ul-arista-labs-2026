@@ -1,26 +1,22 @@
 ---
 # =============================================================================
-# DEPLOY PLAYBOOK  (SSH merge mode)
+# DEPLOY PLAYBOOK  (eAPI merge mode)
 # =============================================================================
-# Pushes the generated EOS configurations to devices via SSH using merge mode.
-# Unlike "configure replace", merge mode only applies the differences — it is
-# much lighter on CPU and never risks cutting management connectivity.
+# Merges the generated EOS configurations onto devices via eAPI (httpapi).
+# Uses arista.eos.eos_config in the default merge mode — only the differences
+# are applied, line by line. This is far lighter than "configure replace" and
+# never disrupts management connectivity.
 #
 # Prerequisites:
 #   - build.yml must have run first (intended/configs/ must exist)
-#   - SSH reachable on port 22 for all devices
+#   - eAPI (HTTP port 80) reachable on all devices
 #
 # Run with:
 #   ansible-playbook deploy.yml
 
-- name: "Deploy: Push configurations via SSH (merge mode)"
+- name: "Deploy: Merge configurations via eAPI"
   hosts: FABRIC
   gather_facts: false
-  vars:
-    ansible_connection: network_cli
-    ansible_network_os: eos
-    ansible_become: true
-    ansible_become_method: enable
   tasks:
     - name: Merge intended configuration onto device
       arista.eos.eos_config:
