@@ -19,8 +19,3 @@ all:
     NETWORK_SERVICES:
       children:
         LEAFS:
-
-    # CONNECTED_ENDPOINTS contains nodes that have server/host connections
-    CONNECTED_ENDPOINTS:
-      children:
-        LEAFS:

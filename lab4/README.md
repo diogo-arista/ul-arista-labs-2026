@@ -35,34 +35,31 @@ By the end of this lab you will be able to:
                         MANAGEMENT NETWORK
                           172.20.20.0/24
               .11              .12              .13
-          ┌───────┐        ┌───────┐        ┌───────┐
-          │spine1 │        │ leaf1 │        │ leaf2 │
-          │AS65001│        │AS65101│        │AS65102│
-          └───┬───┘        └───┬───┘        └───┬───┘
-              │  \         /   │                │
-              │   \       /    │                │
-         Eth1 │    Eth2  Eth1  │ Eth1           │ Eth1
-              │         /     │                │
-              │        /      │                │
-              │  Eth1 /   Eth2│            Eth2│
-          ┌───┴───┐        ┌───┴──┐        ┌───┴──┐
-          │spine1 │        │leaf1 │        │leaf2 │
-          └───────┘        └──┬───┘        └──┬───┘
-                              │               │
-                           Eth2           Eth2
-                              │               │
-                           ┌──┴──┐        ┌──┴──┐
-                           │host1│        │host2│
-                           │.101 │        │.102 │
-                           └─────┘        └─────┘
+          ┌───────────────────────────────────────────┐
+          │                                           │
+      ┌───┴───┐                                       │
+      │spine1 │  AS 65001                             │
+      │       │  Lo0: 192.168.255.1/32                │
+      └───┬───┘                                       │
+         / \                                          │
+        /   \                                         │
+    Eth1     Eth2                                     │
+      /         \                                     │
+  Eth1           Eth1                                 │
+┌───┴───┐     ┌───┴───┐                              │
+│ leaf1 │     │ leaf2 │                              │
+│AS65101│     │AS65102│                              │
+│Lo0:.3 │     │Lo0:.4 │                              │
+│Lo1:.1 │     │Lo1:.2 │                              │
+└───────┘     └───────┘                              │
+    .12             .13 ──────────────────────────────┘
 
 Fabric IP Plan:
   Loopback0  (Router ID):  spine1=192.168.255.1  leaf1=192.168.255.3  leaf2=192.168.255.4
   Loopback1  (VTEP):                             leaf1=192.168.254.1  leaf2=192.168.254.2
   P2P Links:               spine1↔leaf1: 192.168.103.0/31
                            spine1↔leaf2: 192.168.103.2/31
-  Host IPs:                host1=10.10.10.101/24  host2=10.10.10.102/24
-  Anycast GW:              10.10.10.1/24  (same IP on both leaf1 and leaf2)
+  Anycast GW (SVI):        VLAN 10 → 10.10.10.1/24  (same IP on both leafs)
 ```
 
 The fabric uses **eBGP** as both underlay (IPv4 unicast for loopback reachability) and overlay (EVPN for MAC/IP advertisement across VXLAN).
@@ -160,14 +157,13 @@ avd/
     ├── SPINES.yml         ← Spine node definitions
     ├── LEAFS.yml          ← Leaf node definitions
     ├── NETWORK_SERVICES.yml    ← Tenant VLANs and VRFs
-    └── CONNECTED_ENDPOINTS.yml ← Server/host wiring
+    └── CONNECTED_ENDPOINTS.yml ← Server/host wiring (empty in this lab)
 ```
 
 Read through each `group_vars/` file and notice:
 - `FABRIC.yml` sets design-wide choices (protocols, MTU, management settings)
 - `SPINES.yml` and `LEAFS.yml` define *nodes* — each node needs only an ID, BGP AS, and management IP
 - `NETWORK_SERVICES.yml` defines *what services* run on the fabric (VLANs, VRFs, SVIs)
-- `CONNECTED_ENDPOINTS.yml` maps physical server ports to switch interfaces
 
 > **Question:** In `LEAFS.yml`, find the `loopback_ipv4_offset` setting. Using the formula `pool_base + offset + id`, calculate what Loopback0 IP AVD will assign to leaf2.
 
@@ -213,7 +209,7 @@ Now look at the structured intermediate format (the step between YAML intent and
 cat intended/structured_configs/leaf1.yml | head -80
 ```
 
-> **Key insight:** AVD has a two-step process. `eos_designs` converts your *intent* (what you want) into a *structured config* (a device-centric YAML). `eos_cli_config_gen` then renders that into EOS CLI syntax. This separation lets you validate the data model before rendering, and makes it easy to add new platform support.
+> **Key insight:** AVD has a two-step process. `eos_designs` converts your *intent* (what you want) into a *structured config* (a device-centric YAML). `eos_cli_config_gen` then renders that into EOS CLI syntax. This separation lets you validate the data model before rendering and makes it easy to add new platform support.
 
 ---
 
@@ -238,7 +234,6 @@ This document contains:
 - BGP peer groups and their configuration
 - P2P link IP address assignments
 - Loopback IP assignments
-- Connected endpoints table
 
 Open a device-specific document:
 
@@ -246,7 +241,7 @@ Open a device-specific document:
 cat documentation/devices/leaf1.md
 ```
 
-> **Question:** Find the "Connected Endpoints" section in the fabric documentation. Does it correctly reflect what is defined in `CONNECTED_ENDPOINTS.yml`? What switch interface is host1 connected to?
+> **Question:** Find the BGP peer group section in the fabric documentation. Does it correctly list both leaf1 and leaf2 as peers of spine1?
 
 > **Why does this matter?** In production networks, keeping documentation up to date is a constant struggle. With AVD, documentation is generated automatically every time you run `build.yml` — it is *always* in sync with the actual deployed configuration.
 
@@ -287,7 +282,7 @@ leaf1# show vxlan vtep
 > **Questions:**
 > 1. How many BGP sessions does spine1 have? Are they all Established?
 > 2. What EVPN routes does leaf1 have in its BGP table?
-> 3. What VTEPs does leaf1 know about (show vxlan vtep)?
+> 3. Can leaf1 ping leaf2's VTEP IP? Run `ping 192.168.254.2 source Loopback0` from leaf1.
 
 ---
 
@@ -319,35 +314,7 @@ The report shows each test, the device it ran on, and whether it passed or faile
 
 ---
 
-## Exercise 8: End-to-End Connectivity Test
-
-With the fabric deployed and validated, verify that the two hosts can reach each other across the VXLAN fabric:
-
-```bash
-# From your host machine, exec into host1
-sudo docker exec -it clab-lab4-host1 bash
-ping 10.10.10.102 -c 5
-```
-
-You should see successful pings from host1 (10.10.10.101) to host2 (10.10.10.102). Even though host2 is connected to a different leaf switch, the VXLAN EVPN fabric extends VLAN 10 transparently across the spine.
-
-Verify what is happening at the data plane level:
-
-```bash
-# On leaf1, observe the MAC address table
-ssh admin@172.20.20.12
-leaf1# show mac address-table
-leaf1# show bgp evpn route-type mac-ip
-```
-
-> **Questions:**
-> 1. In the MAC table on leaf1, what VLAN and interface is host2's MAC address associated with?
-> 2. How is this different from a traditional (non-VXLAN) network where both hosts would need to be on the same physical switch?
-> 3. Compare this VXLAN setup with what you configured manually in Lab 3. What did AVD do for you automatically?
-
----
-
-## Exercise 9 (Challenge): Day 2 — Add a New VLAN
+## Exercise 8 (Challenge): Day 2 — Add a New VLAN
 
 A core benefit of AVD is that Day 2 operations follow the exact same workflow as Day 1. You change the YAML, rebuild, and redeploy.
 
@@ -355,7 +322,7 @@ A core benefit of AVD is that Day 2 operations follow the exact same workflow as
 
 1. Open `group_vars/NETWORK_SERVICES.yml`
 2. Find the commented-out VLAN 20 example at the bottom of the file
-3. Uncomment and add the new SVI entry under the `svis:` list
+3. Uncomment it and add the new SVI entry under the `svis:` list
 4. Re-run the full workflow:
 
 ```bash
@@ -374,16 +341,16 @@ leaf1# show bgp evpn route-type imet
 ```
 
 > **Questions:**
-> 1. What changed in `intended/configs/leaf1.cfg` after adding VLAN 20? (Hint: diff the new and old file, or look for `vlan 20`)
+> 1. What changed in `intended/configs/leaf1.cfg` after adding VLAN 20?
 > 2. What new BGP EVPN routes appeared after the deployment?
-> 3. How many lines of configuration did you have to write to add the new VLAN?
+> 3. How many lines of YAML did you write to add the new VLAN? How many lines of EOS config did AVD generate?
 > 4. In a production network with 50 leaf switches, what would the traditional (manual) approach require? What does AVD require?
 
 ---
 
 ## Summary
 
-In this lab you have experienced the complete AVD workflow:
+In this lab you experienced the complete AVD workflow:
 
 | Stage | Tool | What happened |
 |-------|------|---------------|

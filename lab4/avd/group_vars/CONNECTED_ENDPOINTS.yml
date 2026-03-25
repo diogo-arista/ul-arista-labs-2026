@@ -1,30 +1,14 @@
 ---
-# =============================================================================
-# CONNECTED ENDPOINTS (SERVERS / HOSTS)
-# =============================================================================
-# This file describes the physical connections between network devices and
-# end hosts. AVD uses this data to configure the access ports on the leaf
-# switches (port mode, VLAN membership, spanning-tree settings, etc.).
+# No physical hosts are connected in this lab topology.
+# This file is intentionally left empty.
+# In a real deployment you would list server wiring here, for example:
 #
-# In a real deployment this file acts as the authoritative "server wiring"
-# document — a single source of truth for how every server connects to the
-# network fabric.
-
-servers:
-  - name: host1
-    adapters:
-      - endpoint_ports: [eth1]        # Interface name on the host side
-        switch_ports: [Ethernet2]     # Interface on the leaf switch
-        switches: [leaf1]             # Which leaf this host connects to
-        vlans: "10"                   # Access VLAN
-        mode: access
-        spanning_tree_portfast: edge  # Skip STP convergence on host ports
-
-  - name: host2
-    adapters:
-      - endpoint_ports: [eth1]
-        switch_ports: [Ethernet2]
-        switches: [leaf2]
-        vlans: "10"
-        mode: access
-        spanning_tree_portfast: edge
+# servers:
+#   - name: server01
+#     adapters:
+#       - endpoint_ports: [eth1]
+#         switch_ports: [Ethernet2]
+#         switches: [leaf1]
+#         vlans: "10"
+#         mode: access
+#         spanning_tree_portfast: edge

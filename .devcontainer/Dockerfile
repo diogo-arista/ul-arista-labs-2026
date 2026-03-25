@@ -4,7 +4,7 @@ FROM mcr.microsoft.com/devcontainers/base:ubuntu
 # 2. Install gdown (using --break-system-packages for Ubuntu 24.04)
 # 3. Install Containerlab
 # 4. Create necessary groups and add 'vscode' user
-RUN apt-get update && apt-get install -y python3-pip curl \
+RUN apt-get update && apt-get install -y python3-pip curl iputils-ping iproute2 \
     && ln -s /usr/bin/python3 /usr/bin/python \
     && pip3 install gdown --break-system-packages --no-cache-dir \
     && pip install pyeapi --break-system-packages \
