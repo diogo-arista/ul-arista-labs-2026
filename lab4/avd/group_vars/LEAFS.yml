@@ -45,13 +45,27 @@ l3leaf:
     - name: leaf1
       id: 1
       bgp_as: "65101"
-      mgmt_ip: 172.20.20.12/24
-      # Explicitly declare which interface on spine1 connects to leaf1.
       uplink_switch_interfaces: [Ethernet1]
+      eos_cli: |
+        interface Management1
+           no shutdown
+           ip address 172.20.20.12/24
+        !
+        management api http-commands
+           protocol http
+           no shutdown
+        !
 
     - name: leaf2
       id: 2
       bgp_as: "65102"
-      mgmt_ip: 172.20.20.13/24
-      # leaf2 connects to spine1's Ethernet2.
       uplink_switch_interfaces: [Ethernet2]
+      eos_cli: |
+        interface Management1
+           no shutdown
+           ip address 172.20.20.13/24
+        !
+        management api http-commands
+           protocol http
+           no shutdown
+        !

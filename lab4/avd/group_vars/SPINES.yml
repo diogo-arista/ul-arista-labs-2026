@@ -21,4 +21,16 @@ spine:
   nodes:
     - name: spine1
       id: 1
-      mgmt_ip: 172.20.20.11/24
+      # Management is injected via eos_cli to ensure Management0 (not the AVD
+      # default Management1) is used and no MGMT VRF is created. This avoids
+      # a known AVD 6.x behaviour where mgmt_interface/mgmt_vrf fabric-level
+      # variables are not resolved correctly by the Python data-model engine.
+      eos_cli: |
+        interface Management1
+           no shutdown
+           ip address 172.20.20.11/24
+        !
+        management api http-commands
+           protocol http
+           no shutdown
+        !

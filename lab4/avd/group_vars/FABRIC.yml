@@ -26,12 +26,6 @@ bgp_peer_groups:
 bgp_maximum_paths: 4
 bgp_ecmp: 4
 
-# --- Management interface ---
-# cEOS uses Management0. AVD will configure this interface on every device.
-mgmt_gateway: 172.20.20.1
-mgmt_interface: Management0
-mgmt_vrf: default
-
 # --- P2P uplink MTU ---
 # Use 1500 in containerlab to avoid fragmentation issues.
 # In production you would typically use 9214 (jumbo frames).

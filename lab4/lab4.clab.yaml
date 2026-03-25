@@ -7,6 +7,8 @@ topology:
       cpu-set: 0-1
       mgmt-ipv4: 172.20.20.11
       startup-config: configs/spine1.cfg
+      binds:
+        - files/EosIntfMapping.json:/mnt/flash/EosIntfMapping.json:ro
 
     leaf1:
       kind: arista_ceos
@@ -14,6 +16,8 @@ topology:
       cpu-set: 0-1
       mgmt-ipv4: 172.20.20.12
       startup-config: configs/leaf1.cfg
+      binds:
+        - files/EosIntfMapping.json:/mnt/flash/EosIntfMapping.json:ro
 
     leaf2:
       kind: arista_ceos
@@ -21,6 +25,8 @@ topology:
       cpu-set: 2-3
       mgmt-ipv4: 172.20.20.13
       startup-config: configs/leaf2.cfg
+      binds:
+        - files/EosIntfMapping.json:/mnt/flash/EosIntfMapping.json:ro
 
   kinds:
     arista_ceos:
