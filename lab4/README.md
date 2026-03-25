@@ -112,15 +112,24 @@ Wait ~30 seconds for the cEOS devices to fully boot, then verify all nodes are r
 sudo containerlab inspect -t lab4.clab.yaml
 ```
 
-Confirm eAPI is reachable on each device:
+Confirm eAPI is reachable on each device (the bootstrap config uses HTTP on port 80):
 
 ```bash
-curl -sk -u admin:admin https://172.20.20.11/command-api \
+curl -s -u admin:admin http://172.20.20.11/command-api \
+  -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","method":"runCmds","params":{"version":1,"cmds":["show version"]},"id":1}' \
   | python3 -m json.tool | grep hostname
 ```
 
 You should see `"hostname": "spine1"`. Repeat for `.12` (leaf1) and `.13` (leaf2).
+
+> **Troubleshooting:** If the command returns nothing, run it without the pipe first to see the raw response:
+> ```bash
+> curl -s -u admin:admin http://172.20.20.11/command-api \
+>   -H "Content-Type: application/json" \
+>   -d '{"jsonrpc":"2.0","method":"runCmds","params":{"version":1,"cmds":["show version"]},"id":1}'
+> ```
+> If cEOS is still booting you may get a connection refused — wait 15 seconds and retry.
 
 > **Question:** At this point, the devices only have the minimal bootstrap configuration (management IP, eAPI, admin user). Try running `show bgp evpn` on spine1. What do you see, and why?
 

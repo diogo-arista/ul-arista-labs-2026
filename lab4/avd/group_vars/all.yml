@@ -8,6 +8,5 @@ ansible_network_os: eos
 ansible_become: true
 ansible_become_method: enable
 ansible_connection: httpapi
-ansible_httpapi_port: 443
-ansible_httpapi_use_ssl: true
-ansible_httpapi_validate_certs: false
+ansible_httpapi_port: 80
+ansible_httpapi_use_ssl: false
