@@ -1,0 +1,30 @@
+---
+# =============================================================================
+# BUILD PLAYBOOK
+# =============================================================================
+# Generates all EOS configurations and documentation from the YAML data model.
+# No devices are touched at this stage — this is a pure offline operation.
+#
+# Output directories (relative to this playbook):
+#   intended/structured_configs/   ← intermediate YAML (data model → structured)
+#   intended/configs/              ← final EOS CLI configurations
+#   documentation/                 ← Markdown fabric and device documentation
+#
+# Run with:
+#   ansible-playbook build.yml
+
+- name: "Build: Generate structured configs from intent (eos_designs)"
+  hosts: FABRIC
+  gather_facts: false
+  tasks:
+    - name: Generate structured configuration (AVD data model → structured YAML)
+      ansible.builtin.import_role:
+        name: arista.avd.eos_designs
+
+- name: "Build: Generate EOS CLI configs and documentation (eos_cli_config_gen)"
+  hosts: FABRIC
+  gather_facts: false
+  tasks:
+    - name: Generate EOS CLI configuration files (structured YAML → EOS config)
+      ansible.builtin.import_role:
+        name: arista.avd.eos_cli_config_gen

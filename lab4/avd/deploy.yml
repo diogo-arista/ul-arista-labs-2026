@@ -1,0 +1,22 @@
+---
+# =============================================================================
+# DEPLOY PLAYBOOK
+# =============================================================================
+# Pushes the generated EOS configurations (from intended/configs/) to the
+# running devices via eAPI. AVD computes the diff and applies only the delta.
+#
+# Prerequisites:
+#   - build.yml must have been run first (intended/configs/ must exist)
+#   - All devices must be reachable on their management IPs
+#   - eAPI must be enabled on all devices (already done in bootstrap configs)
+#
+# Run with:
+#   ansible-playbook deploy.yml
+
+- name: "Deploy: Push configurations to devices via eAPI"
+  hosts: FABRIC
+  gather_facts: false
+  tasks:
+    - name: Deploy configuration via eAPI
+      ansible.builtin.import_role:
+        name: arista.avd.eos_config_deploy_eapi

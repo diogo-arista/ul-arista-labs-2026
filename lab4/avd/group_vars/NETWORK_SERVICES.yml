@@ -1,0 +1,50 @@
+---
+# =============================================================================
+# NETWORK SERVICES (TENANTS, VRFs, VLANs)
+# =============================================================================
+# This file defines Layer 2 and Layer 3 services for the fabric.
+# AVD translates this high-level intent into VXLAN, BGP EVPN, and SVI config.
+#
+# Hierarchy:
+#   Tenant → VRF → SVI/VLAN
+#
+# The tenant concept groups all network services for a single customer or
+# business unit. In this lab we have one tenant: ACME_CORP.
+
+tenants:
+  - name: ACME_CORP
+    # Base VNI for MAC-VRFs. The actual VNI = mac_vrf_vni_base + vlan_id.
+    # VLAN 10 → VNI 10010, VLAN 20 → VNI 10020, etc.
+    mac_vrf_vni_base: 10000
+
+    vrfs:
+      - name: PRODUCTION
+        # VRF VNI is used for L3VPN (IP-VRF) in BGP EVPN.
+        vrf_vni: 10
+
+        svis:
+          # VLAN 10 - "Servers"
+          # AVD configures this SVI on both leaf1 and leaf2, enabling
+          # seamless L2 extension across the VXLAN fabric. Hosts on
+          # different leafs but the same VLAN can communicate at L2.
+          - id: 10
+            name: Servers
+            enabled: true
+            # ip_address_virtual creates an anycast gateway: both leaf1
+            # and leaf2 answer ARP for 10.10.10.1 using the same MAC.
+            # This means hosts can use the same default gateway regardless
+            # of which leaf they are connected to.
+            ip_address_virtual: 10.10.10.1/24
+
+# =============================================================================
+# CHALLENGE: Day 2 Operation
+# =============================================================================
+# To add a new VLAN to the fabric, add a new entry under svis:
+#
+#          - id: 20
+#            name: Management
+#            enabled: true
+#            ip_address_virtual: 10.10.20.1/24
+#
+# Then re-run: ansible-playbook build.yml && ansible-playbook deploy.yml
+# =============================================================================

@@ -1,0 +1,2 @@
+pyavd[anta]>=4.0.0
+ansible-core>=2.15.0

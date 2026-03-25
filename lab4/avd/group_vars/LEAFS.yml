@@ -1,0 +1,57 @@
+---
+# =============================================================================
+# LEAF NODE DEFINITIONS
+# =============================================================================
+# Leaf switches connect to hosts and form VXLAN tunnel endpoints (VTEPs).
+# Each leaf peers with the spine via eBGP (underlay) and uses BGP EVPN
+# (overlay) to advertise MAC and IP reachability across the VXLAN fabric.
+
+# This tells AVD the role of all nodes in the LEAFS inventory group.
+type: l3leaf
+
+l3leaf:
+  defaults:
+    platform: cEOSLab
+
+    # Loopback0 is used as BGP router-ID and OSPF/BGP next-hop.
+    # With loopback_ipv4_offset: 2, the formula is: pool_base + offset + id
+    #   leaf1 (id=1) → 192.168.255.0 + 2 + 1 = 192.168.255.3/32
+    #   leaf2 (id=2) → 192.168.255.0 + 2 + 2 = 192.168.255.4/32
+    loopback_ipv4_pool: 192.168.255.0/27
+    loopback_ipv4_offset: 2
+
+    # Loopback1 is the VTEP source interface (VXLAN tunnel endpoint).
+    #   leaf1 (id=1) → 192.168.254.1/32
+    #   leaf2 (id=2) → 192.168.254.2/32
+    vtep_loopback_ipv4_pool: 192.168.254.0/27
+
+    # Uplink settings: each leaf has one uplink to spine1 via Ethernet1.
+    uplink_switches: [spine1]
+    uplink_interfaces: [Ethernet1]
+
+    # P2P /31 addresses are allocated from this pool.
+    # AVD assigns unique /31 subnets for each spine-leaf link:
+    #   spine1-leaf1: 192.168.103.0/31  (spine=.0, leaf=.1)
+    #   spine1-leaf2: 192.168.103.2/31  (spine=.2, leaf=.3)
+    uplink_ipv4_pool: 192.168.103.0/24
+
+    bgp_defaults:
+      - no bgp default ipv4-unicast
+
+    spanning_tree_mode: mstp
+    spanning_tree_priority: 4096
+
+  nodes:
+    - name: leaf1
+      id: 1
+      bgp_as: "65101"
+      mgmt_ip: 172.20.20.12/24
+      # Explicitly declare which interface on spine1 connects to leaf1.
+      uplink_switch_interfaces: [Ethernet1]
+
+    - name: leaf2
+      id: 2
+      bgp_as: "65102"
+      mgmt_ip: 172.20.20.13/24
+      # leaf2 connects to spine1's Ethernet2.
+      uplink_switch_interfaces: [Ethernet2]

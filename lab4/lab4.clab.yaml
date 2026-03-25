@@ -1,0 +1,59 @@
+name: lab4
+topology:
+  nodes:
+    spine1:
+      kind: arista_ceos
+      cpu: 1
+      cpu-set: 0-1
+      mgmt-ipv4: 172.20.20.11
+      startup-config: configs/spine1.cfg
+
+    leaf1:
+      kind: arista_ceos
+      cpu: 1
+      cpu-set: 0-1
+      mgmt-ipv4: 172.20.20.12
+      startup-config: configs/leaf1.cfg
+
+    leaf2:
+      kind: arista_ceos
+      cpu: 1
+      cpu-set: 2-3
+      mgmt-ipv4: 172.20.20.13
+      startup-config: configs/leaf2.cfg
+
+    host1:
+      kind: linux
+      exec:
+        - ip link set dev eth1 address 00:00:00:00:00:01
+      env:
+        IPV4: 10.10.10.101/24
+        STATIC_ROUTE: 10.0.0.0/8
+        GW: 10.10.10.1
+      startup-delay: 20
+      cpu: 1
+      cpu-set: 0-1
+
+    host2:
+      kind: linux
+      exec:
+        - ip link set dev eth1 address 00:00:00:00:00:02
+      env:
+        IPV4: 10.10.10.102/24
+        STATIC_ROUTE: 10.0.0.0/8
+        GW: 10.10.10.1
+      startup-delay: 20
+      cpu: 1
+      cpu-set: 2-3
+
+  kinds:
+    arista_ceos:
+      image: ceos:latest
+    linux:
+      image: ghcr.io/aristanetworks/aclabs/host-ubuntu:rev1.0
+
+  links:
+    - endpoints: ["spine1:eth1", "leaf1:eth1"]
+    - endpoints: ["spine1:eth2", "leaf2:eth1"]
+    - endpoints: ["host1:eth1", "leaf1:eth2"]
+    - endpoints: ["host2:eth1", "leaf2:eth2"]
