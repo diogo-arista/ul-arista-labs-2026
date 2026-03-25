@@ -1,0 +1,14 @@
+---
+# Raw EOS CLI appended to the end of the generated configuration.
+# Handles management interface and eAPI, bypassing AVD 6.x variable-loading
+# issues with mgmt_interface/mgmt_vrf. Management1 aligns with the
+# EosIntfMapping.json that maps eth0 → Management1 on newer cEOS-lab.
+eos_cli: |
+  interface Management1
+     no shutdown
+     ip address 172.20.20.11/24
+  !
+  management api http-commands
+     protocol http
+     no shutdown
+  !

@@ -1,0 +1,10 @@
+---
+eos_cli: |
+  interface Management1
+     no shutdown
+     ip address 172.20.20.13/24
+  !
+  management api http-commands
+     protocol http
+     no shutdown
+  !

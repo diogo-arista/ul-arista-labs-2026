@@ -2,18 +2,12 @@
 # =============================================================================
 # SPINE NODE DEFINITIONS
 # =============================================================================
-# Spines form the backbone of the fabric. They run eBGP with every leaf
-# (underlay) and act as EVPN route reflectors (overlay).
-
-# This tells AVD the role of all nodes in the SPINES inventory group.
 type: spine
 
 spine:
   defaults:
     platform: cEOSLab
     bgp_as: "65001"
-    # Loopback0 IPs are assigned sequentially from this pool.
-    # spine1 (id=1) → 192.168.255.1/32
     loopback_ipv4_pool: 192.168.255.0/27
     bgp_defaults:
       - no bgp default ipv4-unicast
@@ -21,16 +15,3 @@ spine:
   nodes:
     - name: spine1
       id: 1
-      # Management is injected via eos_cli to ensure Management0 (not the AVD
-      # default Management1) is used and no MGMT VRF is created. This avoids
-      # a known AVD 6.x behaviour where mgmt_interface/mgmt_vrf fabric-level
-      # variables are not resolved correctly by the Python data-model engine.
-      eos_cli: |
-        interface Management1
-           no shutdown
-           ip address 172.20.20.11/24
-        !
-        management api http-commands
-           protocol http
-           no shutdown
-        !
