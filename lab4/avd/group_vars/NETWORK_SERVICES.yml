@@ -16,6 +16,9 @@ tenants:
     # Base VNI for MAC-VRFs. The actual VNI = mac_vrf_vni_base + vlan_id.
     # VLAN 10 → VNI 10010, VLAN 20 → VNI 10020, etc.
     mac_vrf_vni_base: 10000
+    # Anycast gateway MAC shared across all leafs for this tenant.
+    # Required when ip_address_virtual is used on any SVI.
+    virtual_router_mac_address: "00:1c:73:00:dc:01"
 
     vrfs:
       - name: PRODUCTION
