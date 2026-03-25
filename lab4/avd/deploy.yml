@@ -1,22 +1,27 @@
 ---
 # =============================================================================
-# DEPLOY PLAYBOOK
+# DEPLOY PLAYBOOK  (SSH merge mode)
 # =============================================================================
-# Pushes the generated EOS configurations (from intended/configs/) to the
-# running devices via eAPI. AVD computes the diff and applies only the delta.
+# Pushes the generated EOS configurations to devices via SSH using merge mode.
+# Unlike "configure replace", merge mode only applies the differences — it is
+# much lighter on CPU and never risks cutting management connectivity.
 #
 # Prerequisites:
-#   - build.yml must have been run first (intended/configs/ must exist)
-#   - All devices must be reachable on their management IPs
-#   - eAPI must be enabled on all devices (already done in bootstrap configs)
+#   - build.yml must have run first (intended/configs/ must exist)
+#   - SSH reachable on port 22 for all devices
 #
 # Run with:
 #   ansible-playbook deploy.yml
 
-- name: "Deploy: Push configurations to devices via eAPI"
+- name: "Deploy: Push configurations via SSH (merge mode)"
   hosts: FABRIC
   gather_facts: false
+  vars:
+    ansible_connection: network_cli
+    ansible_network_os: eos
+    ansible_become: true
+    ansible_become_method: enable
   tasks:
-    - name: Deploy configuration via eAPI
-      ansible.builtin.import_role:
-        name: arista.avd.eos_config_deploy_eapi
+    - name: Merge intended configuration onto device
+      arista.eos.eos_config:
+        src: "{{ playbook_dir }}/intended/configs/{{ inventory_hostname }}.cfg"

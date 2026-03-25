@@ -2,3 +2,4 @@
 collections:
   - name: arista.avd
     version: ">=4.0.0"
+  - name: arista.eos
