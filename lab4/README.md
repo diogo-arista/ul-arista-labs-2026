@@ -86,6 +86,12 @@ pip install -r requirements.txt --break-system-packages
 ansible-galaxy collection install -r requirements.yml
 ```
 
+Ansible refuses to load `ansible.cfg` from a world-writable directory (a security restriction). In Codespaces the workspace is world-writable by default, so fix the permissions once:
+
+```bash
+chmod o-w /workspaces/ul-arista-labs-2026/lab4/avd
+```
+
 Verify the installation:
 
 ```bash
@@ -106,7 +112,7 @@ cd ..   # back to lab4/
 sudo containerlab deploy -t lab4.clab.yaml
 ```
 
-Wait ~30 seconds for the cEOS devices to fully boot, then verify all nodes are running:
+Wait ~60 seconds for the cEOS devices to fully boot. cEOS responds to ping quickly, but the management API (nginx) takes an extra 30–40 seconds to start. Hitting the API too early returns an empty response. Then verify all nodes are running:
 
 ```bash
 sudo containerlab inspect -t lab4.clab.yaml

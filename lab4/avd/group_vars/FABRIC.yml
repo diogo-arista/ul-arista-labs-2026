@@ -40,3 +40,9 @@ p2p_uplinks_mtu: 1500
 # --- EVPN ---
 # Import pruning reduces unnecessary EVPN route imports.
 evpn_import_pruning: true
+
+# --- Anycast gateway MAC (VARP) ---
+# When ip_address_virtual is used on an SVI, both leafs answer ARP for the
+# same gateway IP. They must share a single virtual MAC so hosts always get
+# a consistent ARP reply regardless of which leaf they are connected to.
+virtual_router_mac_address: "00:1c:73:00:dc:01"
