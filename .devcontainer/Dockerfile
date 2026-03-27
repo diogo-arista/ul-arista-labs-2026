@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/devcontainers/base:ubuntu
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-24.04
 
 # 1. Install system dependencies & setup python alias
 # 2. Install gdown (using --break-system-packages for Ubuntu 24.04)
@@ -10,7 +10,7 @@ RUN apt-get update && apt-get install -y python3-pip curl iputils-ping iproute2 
     && pip install pyeapi --break-system-packages \
     && pip install pygnmi --break-system-packages \
     && pip install "pyavd[anta]>=4.0.0" ansible-core --break-system-packages \
-    && apt install jq \
+    && apt-get install -y jq \
     && ansible-galaxy collection install arista.avd \
     && curl -sL https://get.containerlab.dev | bash \
     && groupadd -f docker \
